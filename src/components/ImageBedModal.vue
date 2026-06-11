@@ -1,12 +1,12 @@
 <template>
   <Teleport to="body">
-    <div v-if="mounted" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div v-if="mounted" class="modal-overlay">
       <Transition appear enter-from-class="opacity-0" enter-to-class="opacity-100"
                   enter-active-class="transition-opacity duration-300"
                   leave-from-class="opacity-100" leave-to-class="opacity-0"
                   leave-active-class="transition-opacity duration-300"
                   @after-leave="onAfterLeave">
-        <div v-show="modelValue" class="absolute inset-0 bg-black/60" @click="$emit('update:modelValue', false)"></div>
+        <div v-show="modelValue" class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="$emit('update:modelValue', false)"></div>
       </Transition>
 
       <Transition appear enter-from-class="opacity-0 translate-y-4 scale-95" enter-to-class="opacity-100 translate-y-0 scale-100"
@@ -14,12 +14,12 @@
                   leave-from-class="opacity-100 translate-y-0 scale-100" leave-to-class="opacity-0 translate-y-4 scale-95"
                   leave-active-class="transition-all duration-300 transform"
                   @after-leave="onAfterLeave">
-        <div v-show="modelValue" class="relative bg-white rounded-lg shadow-xl w-full max-w-lg border border-gray-200 max-h-[90vh] flex flex-col"
+        <div v-show="modelValue" class="relative bg-white rounded-2xl shadow-xl w-full max-w-lg border border-gray-100 max-h-[90vh] flex flex-col"
              @click.stop>
           <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 shrink-0">
-            <h3 class="text-base font-medium">{{ canvasBlob ? '获取直链' : '图片上传' }}</h3>
+            <h3 class="text-base font-semibold text-gray-800">{{ canvasBlob ? '获取直链' : '图片上传' }}</h3>
             <button @click="$emit('update:modelValue', false)"
-                    class="p-1 hover:bg-gray-100 rounded-full transition-colors">
+                    class="p-2 hover:bg-gray-100 rounded-xl transition-all duration-200 hover:scale-110">
               <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -135,11 +135,11 @@
 
                 <div class="flex gap-3 pt-2">
                   <button @click="saveConfig" :disabled="!isConfigValid"
-                          class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                          class="flex-1 btn-primary">
                     保存配置
                   </button>
                   <button @click="testConnection" :disabled="isTesting || !isConfigValid"
-                          class="flex-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                          class="flex-1 btn-outline flex items-center justify-center gap-2">
                     <svg v-if="isTesting" class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                       <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"/>
                       <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -247,11 +247,11 @@
 
           <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100 shrink-0">
             <button @click="$emit('update:modelValue', false)"
-                    class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors text-sm">
+                    class="btn-outline">
               关闭
             </button>
             <button v-if="canvasBlob" @click="autoUploadCanvas" :disabled="!isConfigValid || isUploading"
-                    class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    class="btn-primary flex items-center gap-2">
               <svg v-if="isUploading" class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"/>
                 <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -259,7 +259,7 @@
               {{ isUploading ? '上传中...' : '开始上传' }}
             </button>
             <button v-else @click="uploadSelectedFile" :disabled="!selectedFile || !isConfigValid || isUploading"
-                    class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    class="btn-primary flex items-center gap-2">
               <svg v-if="isUploading" class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"/>
                 <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>

@@ -1,6 +1,6 @@
 <template>
-  <footer class="sm:mt-12 mb-2 text-center text-xs sm:text-sm">
-    <div class="flex flex-wrap justify-center gap-x-2 gap-y-1">
+  <footer class="sm:mt-8 mb-4 text-center text-xs sm:text-sm">
+    <div class="flex flex-wrap justify-center gap-x-2 gap-y-1 text-gray-500">
       <span>富强</span>
       <span>民主</span>
       <span>文明</span>
@@ -14,16 +14,16 @@
       <span>诚信</span>
       <span>友善</span>
     </div>
-    <div class="mt-2 space-x-2">
+    <div class="mt-3 space-x-3 text-gray-600">
       <span>© 2026</span>
       <a href="https://www.shiguang666.eu.org/" 
          target="_blank"
-         class="font-bold text-green-600 hover:text-gray-600 transition-colors">時光</a>
-      <button class="text-pink-500 font-bold" @click="toggleTips">小提示</button>
+         class="font-bold text-primary-600 hover:text-primary-700 transition-colors">時光</a>
+      <button class="text-pink-500 hover:text-pink-600 font-bold transition-colors" @click="toggleTips">小提示</button>
     </div>
     
     <!-- 小提示弹窗 -->
-    <div class="fixed top-0 left-1/2 w-[90%] max-w-[600px] max-h-[82px] p-[10px] mt-[10px] bg-white text-[#333] rounded-[10px] shadow-[0_4px_8px_#0000001a] z-100 flex flex-col justify-center items-center text-center overflow-hidden transition-all duration-300 ease-in-out"
+    <div class="fixed top-0 left-1/2 w-[90%] max-w-[600px] max-h-[82px] p-[10px] mt-[10px] bg-white/90 backdrop-blur-sm text-gray-700 rounded-2xl shadow-lg z-100 flex flex-col justify-center items-center text-center overflow-hidden transition-all duration-300 ease-in-out border border-gray-100"
          :style="{
            opacity: showTipsPopup ? 1 : 0,
            visibility: showTipsPopup ? 'visible' : 'hidden',

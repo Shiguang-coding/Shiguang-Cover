@@ -10,7 +10,7 @@ const fonts = [
 ];
 
 export const defaultConfig = {
-    text: '時光',
+    text: '時光       封面',
     watermark: '@時光',
     fontFamily: 'MaokenZhuyuanTi',
     fontStyles: fonts.map(f => f[2]).filter(Boolean),

@@ -1,7 +1,7 @@
 <template>
-  <main class="container mx-auto max-w-[1600px] p-4 flex flex-col lg:flex-row lg:flex-wrap justify-center items-center gap-5">
+  <main class="container mx-auto max-w-[1600px] p-4 flex flex-col lg:flex-row lg:flex-wrap justify-center items-center gap-6">
     <!-- 控制面板 -->
-    <div class="w-full lg:flex-1 flex flex-col p-4 bg-white rounded-lg shadow-md">
+    <div class="w-full lg:flex-1 flex flex-col p-5 card">
       <!-- 网址图标选择器 -->
       <div class="flex flex-col gap-2 mb-3">
         <div class="flex flex-col sm:flex-row gap-2">
@@ -10,12 +10,12 @@
             v-model="siteIconInput"
             @keyup.enter="loadSiteIcon"
             placeholder="输入网址或域名，例如 openai.com"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 text-sm"
+            class="input flex-1"
           />
           <button
             @click="loadSiteIcon"
             :disabled="isLoadingSiteIcon"
-            class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm whitespace-nowrap disabled:bg-gray-300 disabled:cursor-not-allowed"
+            class="btn-primary whitespace-nowrap"
           >
             {{ isLoadingSiteIcon ? '获取中...' : '获取站点图标' }}
           </button>
@@ -37,12 +37,12 @@
             v-model="iconName"
             @input="loadIcon"
             :placeholder="iconInputPlaceholder"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 text-sm"
+            class="input flex-1"
           />
           <a 
             :href="iconBrowseLink"
             target="_blank"
-            class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm whitespace-nowrap"
+            class="btn-primary whitespace-nowrap"
           >浏览图标</a>
         </div>
         <!-- 图标源选择器 -->
@@ -50,7 +50,7 @@
           <select
             v-model="iconSource"
             @change="onIconSourceChange"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 text-sm"
+            class="input flex-1"
           >
             <option
               v-for="option in iconSourceOptions"
@@ -64,7 +64,7 @@
           <select
             v-model="iconVariant"
             @change="loadIcon"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 text-sm"
+            class="input flex-1"
           >
             <option
               v-for="option in currentVariantOptions"
@@ -382,17 +382,17 @@
       </div>
 
       <!-- 操作按钮 -->
-      <div class="flex gap-3">
+      <div class="flex gap-3 mt-4">
         <button 
           @click="saveWebp"
-          class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+          class="flex-1 btn-primary"
         >
           保存图片
         </button>
         <ImageBedModal v-model="showImageBedModal" :canvas-blob="canvasBlob" @upload-success="onUploadSuccess" />
         <button 
           @click="handleGetLink"
-          class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+          class="flex-1 btn-secondary"
         >
           获取直链
         </button>
@@ -400,7 +400,7 @@
     </div>
 
     <!-- 画布预览 -->
-    <div class="relative w-full lg:flex-[2] overflow-hidden">
+    <div class="relative w-full lg:flex-[2] card p-4">
       <canvas 
         id="canvasPreview" 
         width="1000" 
@@ -408,7 +408,7 @@
         @dragover.prevent="handleCanvasDragOver"
         @dragleave.prevent="handleCanvasDragLeave"
         @drop.prevent="handleCanvasDrop" 
-        class="w-full h-auto rounded-lg shadow-md"
+        class="w-full h-auto rounded-xl shadow-lg"
       ></canvas>
       <!-- 图标区高亮 -->
       <div
@@ -505,14 +505,14 @@ export default {
     return {
       state,
       defaultConfig,
-      iconName: '',
+      iconName: 'LobeHub',
       iconUrl: null,
       siteIconInput: '',
       siteIconStatus: '',
       siteIconStatusType: 'info',
       isLoadingSiteIcon: false,
       iconSource: 'lobe',           // 当前图标源: lobe / thesvg / devicons / iconify
-      iconVariant: 'avatar',        // 当前变体（根据图标源动态切换）
+      iconVariant: 'icon-color',        // 当前变体（根据图标源动态切换）
       dragHighlight: null,
       showImageBedModal: false,
       canvasBlob: null,
@@ -621,6 +621,11 @@ export default {
   mounted() {
     this.loadStyles();
     initialize();
+    
+    // 自动加载默认图标
+    if (this.iconName) {
+      this.loadIcon();
+    }
     
     // Add click outside listener
     document.addEventListener('click', this.handleClickOutside);
