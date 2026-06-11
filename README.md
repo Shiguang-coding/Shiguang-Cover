@@ -22,7 +22,7 @@
   </a>
 </p>
 <p align="center">🎮 在线演示：
-  <a href="hhttps://cover.shiguang666.eu.org/" target="_blank">https://cover.shiguang666.eu.org/</a>
+  <a href="https://cover.shiguang666.eu.org" target="_blank">https://cover.shiguang666.eu.org</a>
 </p>
 
 ## 📖 简介
