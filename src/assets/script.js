@@ -6,13 +6,10 @@ export const state = reactive({
     bgImageUrl: null,
     squareImageUrl: null,
     bgColor: '#000000',
-    // textColor: '#eeeeee',
     textColor: '#ffffff',
-    // watermarkColor: '#dddddd',
     watermarkColor: '#ffffff',
     iconColor: '#eeeeee',
     rotation: 0,
-    // shadowColor: '#646464',
     shadowColor: '#e1e1e1',
     shadowBlur: 120,
     shadowOffsetX: 1,
@@ -391,6 +388,16 @@ export function saveWebp() {
             URL.revokeObjectURL(link.href);
         }, 'image/webp');
     }
+}
+
+export function getCanvasBlob() {
+    return new Promise((resolve) => {
+        if (canvas) {
+            canvas.toBlob(blob => resolve(blob), 'image/webp');
+        } else {
+            resolve(null);
+        }
+    });
 }
 
 export function initialize() {

@@ -10,11 +10,8 @@ const fonts = [
 ];
 
 export const defaultConfig = {
-    // text: '梦爱吃鱼',       // 默认文本
-    text: '時光',       // 默认文本
-    // watermark: '@梦爱吃鱼', // 默认水印
-    watermark: '@時光', // 默认水印
-    // fontFamily: import.meta.env.VITE_APP_FONT_FAMILY,
+    text: '時光',
+    watermark: '@時光',
     fontFamily: 'MaokenZhuyuanTi',
     fontStyles: fonts.map(f => f[2]).filter(Boolean),
     fontOptions: fonts.map(([value, label]) => ({ value, label }))

@@ -2,8 +2,8 @@
 node_modules
 /dist
 
-
-# local env files
+# env files
+.env
 .env.local
 .env.*.local
 
@@ -22,6 +22,16 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
+# Lock files
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+# MiMoCode
+.mimocode
+
+# Playwright CLI
+.playwright-cli
+
+# WorkBuddy
+.workbuddy

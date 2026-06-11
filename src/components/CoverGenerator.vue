@@ -36,29 +36,45 @@
             type="text" 
             v-model="iconName"
             @input="loadIcon"
-            placeholder="输入图标名称，例如 openai 或 logos:chrome"
+            :placeholder="iconInputPlaceholder"
             class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 text-sm"
           />
           <a 
-            href="https://lobehub.com/icons" 
+            :href="iconBrowseLink"
             target="_blank"
             class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm whitespace-nowrap"
-          >Lobe Icons</a>
+          >浏览图标</a>
         </div>
-        <!-- 图标样式预设选择 -->
-        <select
-          v-model="lobeIconPreset"
-          @change="loadIcon"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 text-sm"
-        >
-          <option
-            v-for="option in lobeIconPresetOptions"
-            :key="option.value"
-            :value="option.value"
+        <!-- 图标源选择器 -->
+        <div class="flex gap-2">
+          <select
+            v-model="iconSource"
+            @change="onIconSourceChange"
+            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 text-sm"
           >
-            {{ option.label }}
-          </option>
-        </select>
+            <option
+              v-for="option in iconSourceOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+          <!-- 变体选择器 -->
+          <select
+            v-model="iconVariant"
+            @change="loadIcon"
+            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 text-sm"
+          >
+            <option
+              v-for="option in currentVariantOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <!-- 背景设置 -->
@@ -373,6 +389,13 @@
         >
           保存图片
         </button>
+        <ImageBedModal v-model="showImageBedModal" :canvas-blob="canvasBlob" @upload-success="onUploadSuccess" />
+        <button 
+          @click="handleGetLink"
+          class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+        >
+          获取直链
+        </button>
       </div>
     </div>
 
@@ -410,13 +433,74 @@
     </div>
 
   </main>
+
+  <!-- Toast 提示 -->
+  <Teleport to="body">
+    <Transition
+      enter-from-class="opacity-0 -translate-y-4"
+      enter-to-class="opacity-100 translate-y-0"
+      enter-active-class="transition-all duration-300 ease-out"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-4"
+      leave-active-class="transition-all duration-200 ease-in"
+    >
+      <div
+        v-if="toast.show"
+        class="fixed top-5 left-1/2 -translate-x-1/2 z-[60] w-[90%] max-w-md"
+      >
+        <div
+          class="flex items-start gap-3 rounded-xl shadow-lg border px-4 py-3 backdrop-blur-sm"
+          :class="{
+            'bg-red-50/95 border-red-200 text-red-800': toast.type === 'error',
+            'bg-green-50/95 border-green-200 text-green-800': toast.type === 'success',
+            'bg-white/95 border-gray-200 text-gray-800': toast.type === 'info'
+          }"
+        >
+          <!-- 图标 -->
+          <div class="shrink-0 mt-0.5">
+            <svg v-if="toast.type === 'error'" class="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M15 9l-6 6M9 9l6 6"/>
+            </svg>
+            <svg v-else-if="toast.type === 'success'" class="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <svg v-else class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+          </div>
+          <!-- 内容 -->
+          <div class="flex-1 min-w-0">
+            <p v-if="toast.title" class="text-sm font-semibold mb-0.5">{{ toast.title }}</p>
+            <p class="text-sm leading-relaxed">{{ toast.message }}</p>
+          </div>
+          <!-- 关闭按钮 -->
+          <button
+            @click="toast.show = false"
+            class="shrink-0 -mr-1 -mt-1 p-1 rounded-full hover:bg-black/5 transition-colors"
+            :class="toast.type === 'error' ? 'text-red-600' : toast.type === 'success' ? 'text-green-600' : 'text-gray-500'"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <script>
-import { state, updatePreview, saveWebp, drawSquareImage, drawBackground, initialize } from '../assets/script.js';
+import { state, updatePreview, saveWebp, getCanvasBlob, drawSquareImage, drawBackground, initialize } from '../assets/script.js';
 import { defaultConfig } from '../config';
+import ImageBedModal from './ImageBedModal.vue';
 
 export default {
+  components: {
+    ImageBedModal
+  },
   data() {
     return {
       state,
@@ -427,24 +511,83 @@ export default {
       siteIconStatus: '',
       siteIconStatusType: 'info',
       isLoadingSiteIcon: false,
-      lobeIconPreset: 'avatar',      // 默认头像样式
-      lobeIconFallback: 'enabled',   // 兜底策略 (内部保留)
-      dragHighlight: null
+      iconSource: 'lobe',           // 当前图标源: lobe / thesvg / devicons / iconify
+      iconVariant: 'avatar',        // 当前变体（根据图标源动态切换）
+      dragHighlight: null,
+      showImageBedModal: false,
+      canvasBlob: null,
+      toast: {
+        show: false,
+        title: '',
+        message: '',
+        type: 'info'
+      },
+      toastTimer: null
     };
   },
   computed: {
-    // 6种图标样式预设（对应 lobehub/icons 的 6 种用法）
-    lobeIconPresetOptions() {
+    // 图标源选项
+    iconSourceOptions() {
       return [
-        { value: 'icon', label: '官方图标 (Icons)' },
-        { value: 'icon-color', label: '品牌色图标 (Icons.Color)' },
-        { value: 'text', label: '文字 (Text)' },
-        { value: 'combine', label: '组合图标 (Combine)' },
-        { value: 'combine-color', label: '品牌色组合 (Combine Color)' },
-        { value: 'avatar', label: '头像 (Avatar)' }
+        { value: 'lobe', label: 'LobeHub Icons' },
+        { value: 'thesvg', label: 'theSVG' },
+        { value: 'devicons', label: 'Developer Icons' },
+        { value: 'iconify', label: 'Iconify' }
       ];
     },
-    // 从预设值解析出 variant 和 color
+    // 当前图标源的变体选项
+    currentVariantOptions() {
+      const variantMap = {
+        lobe: [
+          { value: 'icon', label: '官方图标 (Icons)' },
+          { value: 'icon-color', label: '品牌色图标 (Icons.Color)' },
+          { value: 'text', label: '文字 (Text)' },
+          { value: 'combine', label: '组合图标 (Combine)' },
+          { value: 'combine-color', label: '品牌色组合 (Combine Color)' },
+          { value: 'avatar', label: '头像 (Avatar)' }
+        ],
+        thesvg: [
+          { value: 'default', label: '默认 (Default)' },
+          { value: 'mono', label: '单色 (Mono)' },
+          { value: 'light', label: '浅色 (Light)' },
+          { value: 'dark', label: '深色 (Dark)' },
+          { value: 'wordmark', label: '文字标识 (Wordmark)' },
+          { value: 'wordmarkLight', label: '浅色文字 (Wordmark Light)' },
+          { value: 'wordmarkDark', label: '深色文字 (Wordmark Dark)' }
+        ],
+        devicons: [
+          { value: 'default', label: '默认 (Default)' },
+          { value: 'dark', label: '深色 (Dark)' },
+          { value: 'light', label: '浅色 (Light)' },
+          { value: 'wordmark', label: '文字标识 (Wordmark)' }
+        ],
+        iconify: [
+          { value: 'default', label: '默认 (Default)' }
+        ]
+      };
+      return variantMap[this.iconSource] || variantMap.lobe;
+    },
+    // 输入框占位文本
+    iconInputPlaceholder() {
+      const placeholders = {
+        lobe: '输入图标名称，例如 openai',
+        thesvg: '输入图标名称，例如 github、openai',
+        devicons: '输入图标名称，例如 docker、react',
+        iconify: '输入图标名称，例如 logos:chrome'
+      };
+      return placeholders[this.iconSource] || placeholders.lobe;
+    },
+    // 浏览图标链接
+    iconBrowseLink() {
+      const links = {
+        lobe: 'https://lobehub.com/icons',
+        thesvg: 'https://thesvg.org',
+        devicons: 'https://xandemon.github.io/developer-icons/icons/All',
+        iconify: 'https://icon-sets.iconify.design/'
+      };
+      return links[this.iconSource] || links.lobe;
+    },
+    // 从 LobeHub 预设值解析出 variant 和 color
     lobeIconVariant() {
       const map = {
         'icon': 'icon',
@@ -454,7 +597,11 @@ export default {
         'combine-color': 'combine',
         'avatar': 'avatar'
       };
-      return map[this.lobeIconPreset] || 'icon';
+      // 当图标源是 lobe 时，使用 iconVariant 作为 lobeIconPreset
+      if (this.iconSource === 'lobe') {
+        return map[this.iconVariant] || 'icon';
+      }
+      return 'icon';
     },
     lobeIconColor() {
       const map = {
@@ -465,9 +612,11 @@ export default {
         'combine-color': 'color',
         'avatar': 'mono'
       };
-      return map[this.lobeIconPreset] || 'mono';
+      if (this.iconSource === 'lobe') {
+        return map[this.iconVariant] || 'mono';
+      }
+      return 'mono';
     },
-    // 图标格式选项（已移除，内部根据预设自动选择最优格式）
   },
   mounted() {
     this.loadStyles();
@@ -491,6 +640,13 @@ export default {
     },
     updatePreview,
     saveWebp,
+    async handleGetLink() {
+      this.canvasBlob = await getCanvasBlob();
+      this.showImageBedModal = true;
+    },
+    onUploadSuccess(url) {
+      this.showToast('上传成功', '链接已复制到剪贴板', 'success');
+    },
     loadIcon() {
       const iconName = this.iconName.trim();
       if (iconName) {
@@ -500,20 +656,54 @@ export default {
         state.squareImageUrl = null;
       }
     },
+    onIconSourceChange() {
+      // 切换图标源时，重置变体为该源的默认值
+      const defaultVariants = {
+        lobe: 'avatar',
+        thesvg: 'default',
+        devicons: 'default',
+        iconify: 'default'
+      };
+      this.iconVariant = defaultVariants[this.iconSource] || 'default';
+      // 如果已有图标名称，重新加载
+      if (this.iconName.trim()) {
+        this.loadIcon();
+      }
+    },
     getIconUrls(iconName) {
+      // 支持前缀路由：lobe: / thesvg: / svg: / dev: / devicon:
       const lobeMatch = iconName.match(/^(?:lobe|lobehub|lobe-icons):(.+)$/i);
+      const thesvgMatch = iconName.match(/^(?:thesvg|svg):(.+)$/i);
+      const deviconsMatch = iconName.match(/^(?:dev|devicon|devicons):(.+)$/i);
       const isLobeUrl = /^https?:\/\/lobehub\.com\/icons\//i.test(iconName);
-      if (!lobeMatch && !isLobeUrl && iconName.includes(':')) {
+
+      // 前缀路由优先
+      if (thesvgMatch) {
+        return this.getThesvgIconUrls(thesvgMatch[1]);
+      }
+      if (deviconsMatch) {
+        return this.getDevIconUrls(deviconsMatch[1]);
+      }
+
+      // Iconify 前缀（包含冒号但不是 LobeHub 前缀）
+      if (this.iconSource === 'iconify' || (!lobeMatch && !isLobeUrl && iconName.includes(':'))) {
         return [`https://api.iconify.design/${iconName}.svg`];
       }
 
+      // 根据当前选中的图标源路由
+      if (this.iconSource === 'thesvg') {
+        return this.getThesvgIconUrls(iconName);
+      }
+      if (this.iconSource === 'devicons') {
+        return this.getDevIconUrls(iconName);
+      }
+
+      // 默认 LobeHub
       return this.getLobeIconUrls(lobeMatch ? lobeMatch[1] : iconName);
     },
     getLobeIconUrls(iconName) {
       const icon = this.parseLobeIconName(iconName);
-      const slugs = this.lobeIconFallback === 'strict'
-        ? [icon.slug]
-        : this.getLobeIconFallbackSlugs(icon);
+      const slugs = this.getLobeIconFallbackSlugs(icon);
 
       return slugs.flatMap(slug => this.getLobeIconAssetUrls({ ...icon, slug }));
     },
@@ -588,6 +778,65 @@ export default {
       return [
         `https://registry.npmmirror.com/@lobehub/icons-static-${icon.format}/latest/files/${icon.theme}/${icon.slug}.${icon.format}`
       ];
+    },
+    // theSVG 图标 URL 构建
+    getThesvgIconUrls(iconName) {
+      const slug = iconName.trim().toLowerCase().replace(/\s+/g, '-');
+      const variant = this.iconVariant || 'default';
+      return [
+        `https://thesvg.org/icons/${slug}/${variant}.svg`,
+        `https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/${slug}/${variant}.svg`
+      ];
+    },
+    // Developer Icons 图标 URL 构建
+    getDevIconUrls(iconName) {
+      const slug = iconName.trim().toLowerCase().replace(/\s+/g, '-');
+      const variant = this.iconVariant || 'default';
+      // developer-icons 的变体是文件名后缀（如 docker-dark.svg）
+      const fullSlug = variant === 'default' ? slug : `${slug}-${variant}`;
+      return [
+        `https://cdn.jsdelivr.net/gh/xandemon/developer-icons@main/icons/${fullSlug}.svg`,
+        `https://raw.githubusercontent.com/xandemon/developer-icons/main/icons/${fullSlug}.svg`
+      ];
+    },
+    // 获取默认变体（default）的图标 URL，用于变体回退
+    getDefaultUrls(iconName) {
+      const lobeMatch = iconName.match(/^(?:lobe|lobehub|lobe-icons):(.+)$/i);
+      const thesvgMatch = iconName.match(/^(?:thesvg|svg):(.+)$/i);
+      const deviconsMatch = iconName.match(/^(?:dev|devicon|devicons):(.+)$/i);
+
+      if (thesvgMatch) {
+        const slug = thesvgMatch[1].trim().toLowerCase().replace(/\s+/g, '-');
+        return [
+          `https://thesvg.org/icons/${slug}/default.svg`,
+          `https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/${slug}/default.svg`
+        ];
+      }
+      if (deviconsMatch) {
+        const slug = deviconsMatch[1].trim().toLowerCase().replace(/\s+/g, '-');
+        return [
+          `https://cdn.jsdelivr.net/gh/xandemon/developer-icons@main/icons/${slug}.svg`,
+          `https://raw.githubusercontent.com/xandemon/developer-icons/main/icons/${slug}.svg`
+        ];
+      }
+      if (lobeMatch) {
+        return this.getLobeIconUrls(lobeMatch[1]);
+      }
+
+      const slug = iconName.trim().toLowerCase().replace(/\s+/g, '-');
+      if (this.iconSource === 'thesvg') {
+        return [
+          `https://thesvg.org/icons/${slug}/default.svg`,
+          `https://cdn.jsdelivr.net/gh/glincker/thesvg@main/public/icons/${slug}/default.svg`
+        ];
+      }
+      if (this.iconSource === 'devicons') {
+        return [
+          `https://cdn.jsdelivr.net/gh/xandemon/developer-icons@main/icons/${slug}.svg`,
+          `https://raw.githubusercontent.com/xandemon/developer-icons/main/icons/${slug}.svg`
+        ];
+      }
+      return [];
     },
     parseSiteIconInput(input) {
       const trimmed = input.trim();
@@ -823,8 +1072,22 @@ export default {
 
       if (matchedUrl) {
         this.iconUrl = matchedUrl;
+      } else if (this.iconVariant !== 'default' && this.iconSource !== 'iconify') {
+        // 变体不存在，尝试回退到默认样式
+        const defaultUrls = this.getDefaultUrls(iconName);
+        const fallbackUrl = await this.applyRemoteIcon(defaultUrls);
+        if (fallbackUrl) {
+          this.iconUrl = fallbackUrl;
+          const sourceLabel = this.iconSourceOptions.find(s => s.value === this.iconSource)?.label || this.iconSource;
+          const variantLabel = this.currentVariantOptions.find(v => v.value === this.iconVariant)?.label || this.iconVariant;
+          this.showToast('变体不可用', `该图标在 ${sourceLabel} 中没有 "${variantLabel}" 样式，已自动回退到默认样式。`, 'error');
+        } else {
+          console.error('未找到图标:', iconName);
+          this.showToast('未找到图标', `未找到图标 "${iconName}"，请检查名称或尝试切换图标源/变体。`, 'error');
+        }
       } else {
         console.error('未找到图标:', iconName);
+        this.showToast('未找到图标', `未找到图标 "${iconName}"，请检查名称或尝试切换图标源/变体。`, 'error');
       }
     },
     drawSquareImage,
@@ -876,6 +1139,16 @@ export default {
       if (dropdown && !dropdown.contains(event.target)) {
         state.isFontMenuOpen = false;
       }
+    },
+    showToast(title, message, type = 'info') {
+      if (this.toastTimer) {
+        clearTimeout(this.toastTimer);
+        this.toastTimer = null;
+      }
+      this.toast = { show: true, title, message, type };
+      this.toastTimer = setTimeout(() => {
+        this.toast.show = false;
+      }, 3500);
     }
   }
 };
