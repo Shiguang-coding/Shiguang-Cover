@@ -363,7 +363,7 @@
       <!-- 标题输入 -->
       <textarea 
         id="inputText"
-        :value="''"
+        :value="state.text"
         @input="updatePreview('text', $event)"
         placeholder="输入标题"
         rows="2"
@@ -375,21 +375,35 @@
         <input 
           type="text"
           id="inputWatermark"
+          :value="state.watermark"
           @input="updatePreview('watermark', $event)"
           placeholder="输入水印"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500"
         >
       </div>
 
+      <!-- 图片格式选择 -->
+      <div class="flex items-center gap-2 mb-3">
+        <label class="whitespace-nowrap text-sm">图片格式</label>
+        <select 
+          v-model="imageFormat" 
+          class="input flex-1"
+        >
+          <option value="webp">WebP (体积小)</option>
+          <option value="png">PNG (无损)</option>
+          <option value="jpg">JPG (通用)</option>
+        </select>
+      </div>
+
       <!-- 操作按钮 -->
       <div class="flex gap-3 mt-4">
         <button 
-          @click="saveWebp"
+          @click="handleSaveImage"
           class="flex-1 btn-primary"
         >
           保存图片
         </button>
-        <ImageBedModal v-model="showImageBedModal" :canvas-blob="canvasBlob" @upload-success="onUploadSuccess" />
+        <ImageBedModal v-model="showImageBedModal" :canvas-blob="canvasBlob" :image-format="imageFormat" @upload-success="onUploadSuccess" />
         <button 
           @click="handleGetLink"
           class="flex-1 btn-secondary"
@@ -493,7 +507,7 @@
 </template>
 
 <script>
-import { state, updatePreview, saveWebp, getCanvasBlob, drawSquareImage, drawBackground, initialize } from '../assets/script.js';
+import { state, updatePreview, saveImage, getCanvasBlob, drawSquareImage, drawBackground, drawText, drawWatermark, initialize } from '../assets/script.js';
 import { defaultConfig } from '../config';
 import ImageBedModal from './ImageBedModal.vue';
 
@@ -516,6 +530,7 @@ export default {
       dragHighlight: null,
       showImageBedModal: false,
       canvasBlob: null,
+      imageFormat: 'webp',
       toast: {
         show: false,
         title: '',
@@ -644,9 +659,11 @@ export default {
       });
     },
     updatePreview,
-    saveWebp,
+    handleSaveImage() {
+      saveImage(this.imageFormat);
+    },
     async handleGetLink() {
-      this.canvasBlob = await getCanvasBlob();
+      this.canvasBlob = await getCanvasBlob(this.imageFormat);
       this.showImageBedModal = true;
     },
     onUploadSuccess(url) {
@@ -1010,11 +1027,21 @@ export default {
       const objectUrl = URL.createObjectURL(file);
       img.onload = () => {
         try {
-          const color = this.getDominantColor(img);
-          // 主色调为白色/浅色时保持黑色背景不变
-          if (color && !this.isLightColor(color)) {
-            state.bgColor = color;
+          const result = this.getDominantColorWithVariance(img);
+          if (result) {
+            if (result.isMonochrome) {
+              // 纯色图标：使用互补色作为背景，图标颜色作为标题和水印颜色
+              state.bgColor = this.adjustColorForContrast(result.color);
+              state.textColor = result.color;
+              state.watermarkColor = result.color;
+            } else if (!this.isLightColor(result.color)) {
+              // 多色图标：浅色时保持背景不变
+              state.bgColor = result.color;
+            }
+            // 先绘制背景，再绘制文字和水印
             drawBackground();
+            drawText();
+            drawWatermark();
           }
         } finally {
           URL.revokeObjectURL(objectUrl);
@@ -1029,7 +1056,7 @@ export default {
       const b = parseInt(hex.slice(5, 7), 16);
       return (r + g + b) / 3 > 200;
     },
-    getDominantColor(img) {
+    getDominantColorWithVariance(img) {
       // 缩小采样尺寸以提升性能
       const sampleSize = 32;
       const canvas = document.createElement('canvas');
@@ -1040,6 +1067,7 @@ export default {
 
       const data = ctx.getImageData(0, 0, sampleSize, sampleSize).data;
       const colorCounts = new Map();
+      let totalPixels = 0;
 
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
@@ -1057,6 +1085,7 @@ export default {
 
         const key = `${qr},${qg},${qb}`;
         colorCounts.set(key, (colorCounts.get(key) || 0) + 1);
+        totalPixels++;
       }
 
       if (colorCounts.size === 0) return null;
@@ -1069,7 +1098,25 @@ export default {
       });
 
       const [r, g, b] = dominantKey.split(',').map(Number);
-      return '#' + [r, g, b].map(v => Math.min(255, v).toString(16).padStart(2, '0')).join('');
+      const color = '#' + [r, g, b].map(v => Math.min(255, v).toString(16).padStart(2, '0')).join('');
+      
+      // 计算颜色方差：主要颜色占比超过80%视为纯色图标
+      const dominanceRatio = maxCount / totalPixels;
+      const isMonochrome = dominanceRatio > 0.8 && colorCounts.size <= 3;
+      
+      return { color, isMonochrome, dominanceRatio };
+    },
+    adjustColorForContrast(hexColor) {
+      // 返回互补色以形成对比
+      const r = parseInt(hexColor.slice(1, 3), 16);
+      const g = parseInt(hexColor.slice(3, 5), 16);
+      const b = parseInt(hexColor.slice(5, 7), 16);
+      
+      const newR = 255 - r;
+      const newG = 255 - g;
+      const newB = 255 - b;
+      
+      return '#' + [newR, newG, newB].map(v => v.toString(16).padStart(2, '0')).join('');
     },
     async selectIcon(iconName) {
       const iconUrls = this.getIconUrls(iconName);

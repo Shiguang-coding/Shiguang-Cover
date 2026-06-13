@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/favicon.svg" width="100" height="100" alt="Mini-Cover Logo">
+  <img src="public/favicon.svg" width="100" height="100" alt="Shiguang-Cover Logo">
 </p>
 
-<h1 align="center">Mini-Cover</h1>
+<h1 align="center">Shiguang-Cover</h1>
 
 <p align="center">优雅的在线封面生成工具</p>
 
@@ -11,13 +11,13 @@
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
 </p>
 <p align="center">
-  <a href="https://vercel.com/new/clone?repository-url=https://github.com/Shiguang-coding/Mini-Cover">
+  <a href="https://vercel.com/new/clone?repository-url=https://github.com/Shiguang-coding/Shiguang-Cover">
     <img src="https://vercel.com/button" alt="Deploy with Vercel" />
   </a>
-  <a href="https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2FShiguang-coding%2FMini-Cover&output-directory=dist&install-command=npm%20install&build-command=npm%20run%20build" target="_blank" rel="noopener noreferrer">
+  <a href="https://edgeone.ai/pages/new?repository-url=https%3A%2F%2Fgithub.com%2FShiguang-coding%2FShiguang-Cover&output-directory=dist&install-command=npm%20install&build-command=npm%20run%20build" target="_blank" rel="noopener noreferrer">
     <img src="https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg" alt="Deploy with EdgeOne Pages">
   </a>
-  <a href="https://app.netlify.com/start/deploy?repository=https://github.com/Shiguang-coding/Mini-Cover">
+  <a href="https://app.netlify.com/start/deploy?repository=https://github.com/Shiguang-coding/Shiguang-Cover">
     <img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify" />
   </a>
 </p>
@@ -27,9 +27,9 @@
 
 ## 📖 简介
 
-Mini-Cover 是一个现代化的封面生成工具，专为博客、短视频、社交媒体设计。支持多种自定义选项，让你轻松创建个性化封面图片。
+Shiguang-Cover 是一个现代化的封面生成工具，专为博客、短视频、社交媒体设计。支持多种自定义选项，让你轻松创建个性化封面图片。
 
-> 🍴 本项目基于 [JLinMr/Mini-Cover](https://github.com/JLinMr/Mini-Cover) 进行改造。
+> 🍴 本项目基于 [JLinMr/Mini-Cover](https://github.com/JLinMr/Mini-Cover) 进行改造，现更名为 Shiguang-Cover。
 
 ## ✨ 改造内容
 
@@ -111,7 +111,7 @@ export const defaultConfig = {
 ```bash
 # 克隆项目
 
-git clone https://github.com/Shiguang-coding/Mini-Cover.git
+git clone https://github.com/Shiguang-coding/Shiguang-Cover.git
 
 # 安装依赖
 npm install
@@ -130,7 +130,7 @@ npm run build
 
 ### 为什么需要部署 Worker？
 
-Mini-Cover 是浏览器 Web 应用，受浏览器同源策略（CORS）限制。CloudFlare R2 的 S3 API 不处理浏览器的 OPTIONS 预检请求（返回 405），导致所有跨域上传请求被浏览器拦截。
+Shiguang-Cover 是浏览器 Web 应用，受浏览器同源策略（CORS）限制。CloudFlare R2 的 S3 API 不处理浏览器的 OPTIONS 预检请求（返回 405），导致所有跨域上传请求被浏览器拦截。
 
 Node.js / Electron 应用不受 CORS 限制，所以可以直接调用 R2 S3 API。Web 端必须通过 Worker 代理中转。
 
@@ -169,7 +169,7 @@ Workers & Pages → 你的应用 → 设置 → 触发 → 添加自定义域名
 
 **7. 前端配置**
 
-在 Mini-Cover 的图床设置中选择 CloudFlare R2：
+在 Shiguang-Cover 的图床设置中选择 CloudFlare R2：
 
 | 字段 | 值 |
 |------|-----|
@@ -218,7 +218,7 @@ protected $except = [
 
 ### 前端配置
 
-在 Mini-Cover 的图床设置中选择 Lsky Pro：
+在 Shiguang-Cover 的图床设置中选择 Lsky Pro：
 
 | 字段 | 值 |
 |------|-----|

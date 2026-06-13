@@ -286,7 +286,11 @@ export default {
   name: 'ImageBedModal',
   props: {
     modelValue: Boolean,
-    canvasBlob: Blob
+    canvasBlob: Blob,
+    imageFormat: {
+      type: String,
+      default: 'webp'
+    }
   },
   emits: ['update:modelValue', 'upload-success'],
   data() {
@@ -487,7 +491,9 @@ export default {
       this.isUploading = true;
       this.clearStatus();
       try {
-        const file = new File([this.canvasBlob], `cover-${Date.now()}.webp`, { type: 'image/webp' });
+        const mimeTypes = { png: 'image/png', jpg: 'image/jpeg', webp: 'image/webp' };
+        const mime = mimeTypes[this.imageFormat] || 'image/webp';
+        const file = new File([this.canvasBlob], `cover-${Date.now()}.${this.imageFormat}`, { type: mime });
         const url = await this.doUpload(file);
         this.setStatus('上传成功！链接已复制到剪贴板。', 'success', url);
         navigator.clipboard.writeText(url).catch(() => {});
@@ -623,7 +629,7 @@ export default {
     async uploadCfImgBed(file, signal) {
       const { apiUrl, token } = this.config.cfimgbed;
       const fd = new FormData();
-      fd.append('file', file, file.name || `cover-${Date.now()}.webp`);
+      fd.append('file', file, file.name || `cover-${Date.now()}.${this.imageFormat}`);
       const headers = {};
       if (token) headers.Authorization = `Bearer ${token}`;
       const res = await fetch(apiUrl, { method: 'POST', body: fd, headers, signal });
@@ -636,7 +642,7 @@ export default {
     async uploadCfR2(file, signal) {
       const { apiUrl, accessToken, customDomain } = this.config.cfr2;
       const fd = new FormData();
-      fd.append('file', file, file.name || `cover-${Date.now()}.webp`);
+      fd.append('file', file, file.name || `cover-${Date.now()}.${this.imageFormat}`);
       const res = await fetch(apiUrl, {
         method: 'POST',
         body: fd,
@@ -668,7 +674,7 @@ export default {
       if (!token) throw new Error('登录失败: 未获取到 Token');
       
       const fd = new FormData();
-      fd.append('file', file, file.name || `cover-${Date.now()}.webp`);
+      fd.append('file', file, file.name || `cover-${Date.now()}.${this.imageFormat}`);
       const res = await fetch(`${base}/api/v1/upload`, {
         method: 'POST', body: fd, headers: { Authorization: `Bearer ${token}` }, signal
       });

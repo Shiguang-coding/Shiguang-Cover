@@ -11,14 +11,14 @@ export const state = reactive({
     iconColor: '#eeeeee',
     rotation: 0,
     shadowColor: '#ffffff',
-    shadowBlur: 120,
+    shadowBlur: 2,
     shadowOffsetX: 1,
     shadowOffsetY: 1,
-    shadowStrength: 60,
+    shadowStrength: 1,
     watermark: defaultConfig.watermark,
     textSize: 140,
     lineHeight: 1,
-    text3D: 0,
+    text3D: 6,
     squareSize: 300,
     text: defaultConfig.text,
     bgBlur: 3,
@@ -120,7 +120,7 @@ export function updateRotation(event) {
 }
 
 export function updateText(event) {
-    state.text = event.target.value || defaultConfig.text;
+    state.text = event.target.value;
     state.hasMultipleLines = state.text.includes('\n');
     drawText();
 }
@@ -295,7 +295,7 @@ export function drawSquareImage() {
             tempCtx.restore();
 
             squareCtx.save();
-            squareCtx.shadowColor = state.shadowColor;
+            squareCtx.shadowColor = state.shadowBlur > 0 ? state.shadowColor : 'transparent';
             squareCtx.shadowBlur = state.shadowBlur;
             squareCtx.shadowOffsetX = state.shadowOffsetX;
             squareCtx.shadowOffsetY = state.shadowOffsetY;
@@ -324,6 +324,12 @@ function getHtmlFontStyles() {
 
 export function drawText() {
     textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+    
+    if (!state.text) {
+        composeCanvases();
+        return;
+    }
+    
     const { fontFamily } = getHtmlFontStyles();
     const font = state.selectedFont ? `${state.selectedFont}, ${fontFamily}` : fontFamily;
     textCtx.font = `600 ${state.textSize}px ${font}`;
@@ -359,6 +365,12 @@ export function drawText() {
 
 export function drawWatermark() {
     watermarkCtx.clearRect(0, 0, watermarkCanvas.width, watermarkCanvas.height);
+    
+    if (!state.watermark) {
+        composeCanvases();
+        return;
+    }
+    
     const { fontFamily } = getHtmlFontStyles();
     const font = state.selectedFont ? `${state.selectedFont}, ${fontFamily}` : fontFamily;
     watermarkCtx.font = `italic 14px ${font}`;
@@ -378,22 +390,36 @@ export function composeCanvases() {
     }
 }
 
-export function saveWebp() {
+export function saveImage(format = 'webp') {
+    const mimeTypes = {
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        webp: 'image/webp'
+    };
+    const mime = mimeTypes[format] || 'image/webp';
+    
     if (canvas) {
         canvas.toBlob(blob => {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'Canvas-Ruom.webp';
+            link.download = `Shiguang-Cover.${format}`;
             link.click();
             URL.revokeObjectURL(link.href);
-        }, 'image/webp');
+        }, mime);
     }
 }
 
-export function getCanvasBlob() {
+export function getCanvasBlob(format = 'webp') {
+    const mimeTypes = {
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        webp: 'image/webp'
+    };
+    const mime = mimeTypes[format] || 'image/webp';
+    
     return new Promise((resolve) => {
         if (canvas) {
-            canvas.toBlob(blob => resolve(blob), 'image/webp');
+            canvas.toBlob(blob => resolve(blob), mime);
         } else {
             resolve(null);
         }
