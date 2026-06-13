@@ -231,12 +231,12 @@
                  }">
               <p>{{ statusMessage }}</p>
               <template v-if="uploadedUrl">
-                <p class="text-xs text-gray-500 mt-2 mb-1">链接格式</p>
-                <div class="flex gap-1 mb-2 flex-wrap">
+                <p class="text-xs text-gray-500 mt-2 mb-1.5">链接格式</p>
+                <div class="inline-flex bg-gray-100 rounded-lg p-1 gap-1 mb-2">
                   <button v-for="fmt in linkFormats" :key="fmt.key"
                           @click="copyFormat(fmt)"
-                          class="px-2.5 py-1 rounded text-xs font-medium transition-colors"
-                          :class="copiedFormat === fmt.key ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'">
+                          class="px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200"
+                          :class="copiedFormat === fmt.key ? 'bg-green-500 text-white shadow-sm' : 'text-gray-600 hover:bg-white hover:text-gray-800 hover:shadow-sm'">
                     {{ fmt.label }}
                   </button>
                 </div>
@@ -377,7 +377,7 @@ export default {
       try {
         await navigator.clipboard.writeText(fmt.value);
         this.copiedFormat = fmt.key;
-        setTimeout(() => { this.copiedFormat = ''; }, 2000);
+        this.statusMessage = `${fmt.label} 格式已复制到剪贴板`;
       } catch {}
     },
     loadConfig() {
