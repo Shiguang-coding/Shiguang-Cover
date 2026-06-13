@@ -155,11 +155,11 @@ npm run build
 
 ## ☁️ CloudFlare R2 图床部署
 
-### 为什么需要部署 Worker？
+> ### 为什么需要部署 Worker？
+> Shiguang-Cover 是浏览器 Web 应用，受浏览器同源策略（CORS）限制。CloudFlare R2 的 S3 API 不处理浏览器的 OPTIONS 预检请求（返回 405），导致所有跨域上传请求被浏览器拦截。
+> Node.js / Electron 应用不受 CORS 限制，所以可以直接调用 R2 S3 API。Web 端必须通过 Worker 代理中转。
 
-Shiguang-Cover 是浏览器 Web 应用，受浏览器同源策略（CORS）限制。CloudFlare R2 的 S3 API 不处理浏览器的 OPTIONS 预检请求（返回 405），导致所有跨域上传请求被浏览器拦截。
 
-Node.js / Electron 应用不受 CORS 限制，所以可以直接调用 R2 S3 API。Web 端必须通过 Worker 代理中转。
 
 ### 部署步骤
 
