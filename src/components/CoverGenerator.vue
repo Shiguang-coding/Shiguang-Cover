@@ -754,8 +754,8 @@ export default {
         .trim()
         .replace(/^\/+/, '');
       // 根据预设自动选择最优格式：Avatar 固定 WebP，其余统一 SVG
-      const format = this.lobeIconVariant === 'avatar' ? 'webp' : 'svg';
-      const theme = 'light';
+      let format = this.lobeIconVariant === 'avatar' ? 'webp' : 'svg';
+      let theme = 'light';
       let variant = this.lobeIconVariant;
       let color = this.lobeIconColor;
 

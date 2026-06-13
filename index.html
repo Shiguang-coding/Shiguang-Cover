@@ -26,7 +26,7 @@
       (function() {
         var scriptUrl = '%VITE_UMAMI_SCRIPT_URL%';
         var websiteId = '%VITE_UMAMI_WEBSITE_ID%';
-        if (scriptUrl && websiteId) {
+        if (scriptUrl.indexOf('%') === -1 && websiteId.indexOf('%') === -1) {
           var s = document.createElement('script');
           s.defer = true;
           s.src = scriptUrl;
