@@ -35,7 +35,8 @@
           <input 
             type="text" 
             v-model="iconName"
-            @input="loadIcon"
+            @blur="loadIcon"
+            @keyup.enter="loadIcon"
             :placeholder="iconInputPlaceholder"
             class="input flex-1"
           />
@@ -84,16 +85,21 @@
           class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer text-center text-sm"
         >上传背景图片</label>
         <input type="file" id="inputBgImage" accept="image/*" @change="updatePreview('bg', $event)" class="hidden">
+        <button 
+          v-if="state.bgImageUrl"
+          @click="removeBgImage"
+          class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm whitespace-nowrap"
+        >移除背景</button>
         <label 
           for="inputSquareImage" 
           class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors cursor-pointer text-center text-sm"
         >上传图标图片</label>
         <input type="file" id="inputSquareImage" accept="image/*" @change="updatePreview('square', $event)" class="hidden">
-        <a 
-          href="https://icon.ruom.top" 
-          target="_blank"
-          class="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm whitespace-nowrap"
-        >图标下载站</a>
+        <button 
+          v-if="state.squareImageUrl"
+          @click="removeIcon"
+          class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm whitespace-nowrap"
+        >移除图标</button>
       </div>
 
       <!-- 颜色设置 -->
@@ -365,7 +371,7 @@
         id="inputText"
         :value="state.text"
         @input="updatePreview('text', $event)"
-        placeholder="输入标题"
+        :placeholder="defaultConfig.text"
         rows="2"
         class="w-full min-h-[60px] px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500 resize-y mb-3"
       ></textarea>
@@ -377,7 +383,7 @@
           id="inputWatermark"
           :value="state.watermark"
           @input="updatePreview('watermark', $event)"
-          placeholder="输入水印"
+          :placeholder="defaultConfig.watermark"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all duration-300 hover:border-green-500"
         >
       </div>
@@ -644,10 +650,15 @@ export default {
     
     // Add click outside listener
     document.addEventListener('click', this.handleClickOutside);
+    // 阻止拖拽文件到页面时浏览器默认打开文件
+    document.addEventListener('dragover', this.handleDocumentDragOver);
+    document.addEventListener('drop', this.handleDocumentDrop);
   },
   unmounted() {
     // Remove click outside listener
     document.removeEventListener('click', this.handleClickOutside);
+    document.removeEventListener('dragover', this.handleDocumentDragOver);
+    document.removeEventListener('drop', this.handleDocumentDrop);
   },
   methods: {
     loadStyles() {
@@ -659,6 +670,14 @@ export default {
       });
     },
     updatePreview,
+    removeBgImage() {
+      state.bgImageUrl = null;
+      drawBackground();
+    },
+    removeIcon() {
+      state.squareImageUrl = null;
+      drawSquareImage();
+    },
     handleSaveImage() {
       saveImage(this.imageFormat);
     },
@@ -1191,6 +1210,12 @@ export default {
       if (dropdown && !dropdown.contains(event.target)) {
         state.isFontMenuOpen = false;
       }
+    },
+    handleDocumentDragOver(event) {
+      event.preventDefault();
+    },
+    handleDocumentDrop(event) {
+      event.preventDefault();
     },
     showToast(title, message, type = 'info') {
       if (this.toastTimer) {

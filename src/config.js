@@ -10,8 +10,8 @@ const fonts = [
 ];
 
 export const defaultConfig = {
-    text: '時光       封面',
-    watermark: '@時光',
+    text: '输入标题,例如 時光       封面',
+    watermark: '输入水印,例如 @時光',
     fontFamily: 'MaokenZhuyuanTi',
     fontStyles: fonts.map(f => f[2]).filter(Boolean),
     fontOptions: fonts.map(([value, label]) => ({ value, label }))
