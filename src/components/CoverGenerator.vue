@@ -905,12 +905,12 @@ export default {
       const originUrl = site.origin.replace(/\/$/, '');
 
       return [
-        `https://favicon.im/${domain}?larger=true`,
-        `https://favicon.so/${domain}`,
         `${originUrl}/favicon.svg`,
         `${originUrl}/favicon.png`,
         `${originUrl}/apple-touch-icon.png`,
-        `${originUrl}/favicon.ico`
+        `${originUrl}/favicon.ico`,
+        `https://favicon.im/${domain}?larger=true`,
+        `https://favicon.so/${domain}`
       ];
     },
     async loadSiteIcon() {
