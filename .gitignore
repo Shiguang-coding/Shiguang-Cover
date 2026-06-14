@@ -39,3 +39,12 @@ pnpm-lock.yaml
 
 # CodeGraph
 .codegraph/
+
+# MCP
+.mcp.json
+
+# Codex
+.codex/
+
+# Superpowers
+.superpowers/

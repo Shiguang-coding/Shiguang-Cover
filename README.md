@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/favicon.svg" width="100" height="100" alt="Shiguang-Cover Logo">
+  <img src="public/logo.svg" width="100" height="100" alt="Shiguang-Cover Logo">
 </p>
 
 <h1 align="center">Shiguang-Cover</h1>

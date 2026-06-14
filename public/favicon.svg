@@ -1,13 +1,19 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" fill="none" viewBox="0 0 256 256">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    <linearGradient id="a" x1="36" x2="220" y1="28" y2="228" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22C55E"/>
+      <stop offset=".52" stop-color="#0EA5E9"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <linearGradient id="b" x1="70" x2="194" y1="66" y2="196" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFC" stop-opacity=".96"/>
+      <stop offset="1" stop-color="#E0F2FE" stop-opacity=".86"/>
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="6" fill="url(#grad)"/>
-  <rect x="6" y="8" width="20" height="16" rx="2" stroke="white" stroke-width="1.5" fill="none" opacity="0.9"/>
-  <rect x="9" y="11" width="14" height="10" rx="1" stroke="white" stroke-width="1" fill="none" opacity="0.5"/>
-  <path d="M9 19L13 14L17 18L20 15L23 19V21H9V19Z" fill="white" opacity="0.8"/>
-  <circle cx="20" cy="13" r="1.5" fill="white" opacity="0.9"/>
+  <rect width="208" height="208" x="24" y="24" fill="url(#a)" rx="56"/>
+  <path fill="url(#b)" fill-opacity=".95" d="M78 74C78 65.163 85.163 58 94 58H170C178.837 58 186 65.163 186 74V144C186 152.837 178.837 160 170 160H116.627C112.384 160 108.314 161.686 105.314 164.686L87.314 182.686C77.236 192.764 60 185.626 60 171.373V74C60 65.163 67.163 58 76 58H78V74Z"/>
+  <path stroke="#0F172A" stroke-linecap="round" stroke-linejoin="round" stroke-width="22" d="M157 90C145 80 117 80 103 90C91 99 93 113 108 118L143 130C160 136 162 151 149 162C136 173 111 174 97 163"/>
+  <path stroke="#0F172A" stroke-linecap="round" stroke-linejoin="round" stroke-width="14" d="M177 77L177 116C177 122.627 171.627 128 165 128H132" opacity=".22"/>
+  <circle cx="175" cy="77" r="13" fill="#FDE68A"/>
+  <path stroke="#FDE68A" stroke-linecap="round" stroke-width="6" d="M175 58V49M194 77H203M188.435 63.565 194.799 57.201"/>
 </svg>
