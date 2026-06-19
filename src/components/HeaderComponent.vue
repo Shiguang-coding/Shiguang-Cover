@@ -2,7 +2,7 @@
     <header class="flex justify-center px-4 py-4 sm:py-6">
         <div class="flex items-center gap-3">
             <img src="/logo.svg" alt="Shiguang-Cover Logo" class="h-10 w-10 sm:h-11 sm:w-11 rounded-2xl shadow-sm" />
-            <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">{{ title }}</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent" style="line-height: 1.5;">{{ title }}</h1>
             <a href="https://github.com/Shiguang-coding/Shiguang-Cover" target="_blank" 
                class="p-2 text-gray-500 hover:text-gray-800 hover:bg-gray-100 rounded-xl transition-all duration-300 hover:scale-110" title="GitHub">
                 <svg height="20" viewBox="0 0 16 16" width="20" class="sm:w-6 sm:h-6">

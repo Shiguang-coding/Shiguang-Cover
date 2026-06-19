@@ -23,6 +23,7 @@ export const state = reactive({
     text: '',
     bgBlur: 3,
     iconBgSize: 0,
+    borderType: 'rounded',
     selectedFont: defaultConfig.fontFamily,
     isFontMenuOpen: false,
     hasMultipleLines: false
@@ -62,7 +63,8 @@ export function updatePreview(type, event) {
         lineHeight: drawText,
         text3D: updateText3D,
         shadowColor: updateShadowColor,
-        shadowStrength: updateShadowStrength
+        shadowStrength: updateShadowStrength,
+        borderType: updateBorderType
     };
     updateFunctions[type](event);
 }
@@ -155,6 +157,11 @@ export function updateIconBgSize(event) {
     drawSquareImage();
 }
 
+export function updateBorderType(event) {
+    state.borderType = event.target.value;
+    drawSquareImage();
+}
+
 export function updateShadowColor(event) {
     state.shadowColor = event.target.value;
     drawSquareImage();
@@ -225,39 +232,49 @@ export function drawSquareImage() {
             const tempCtx = tempCanvas.getContext('2d');
 
             // 绘制背景
-            if (state.iconBgSize > 0) {
+            if (state.borderType !== 'none') {
                 const bgPadding = state.iconBgSize;
                 tempCtx.fillStyle = state.iconColor;
                 tempCtx.beginPath();
-                tempCtx.moveTo(radius + borderWidth - bgPadding, borderWidth - bgPadding);
-                tempCtx.arcTo(
-                    totalSize - borderWidth + bgPadding, 
-                    borderWidth - bgPadding, 
-                    totalSize - borderWidth + bgPadding, 
-                    radius + borderWidth - bgPadding, 
-                    radius
-                );
-                tempCtx.arcTo(
-                    totalSize - borderWidth + bgPadding, 
-                    totalSize - borderWidth + bgPadding, 
-                    totalSize - radius - borderWidth + bgPadding, 
-                    totalSize - borderWidth + bgPadding, 
-                    radius
-                );
-                tempCtx.arcTo(
-                    borderWidth - bgPadding, 
-                    totalSize - borderWidth + bgPadding, 
-                    borderWidth - bgPadding, 
-                    totalSize - radius - borderWidth + bgPadding, 
-                    radius
-                );
-                tempCtx.arcTo(
-                    borderWidth - bgPadding, 
-                    borderWidth - bgPadding, 
-                    radius + borderWidth - bgPadding, 
-                    borderWidth - bgPadding, 
-                    radius
-                );
+                if (state.borderType === 'circle') {
+                    tempCtx.arc(
+                        totalSize / 2, 
+                        totalSize / 2, 
+                        totalSize / 2 - borderWidth + bgPadding, 
+                        0, 
+                        Math.PI * 2
+                    );
+                } else {
+                    tempCtx.moveTo(radius + borderWidth - bgPadding, borderWidth - bgPadding);
+                    tempCtx.arcTo(
+                        totalSize - borderWidth + bgPadding, 
+                        borderWidth - bgPadding, 
+                        totalSize - borderWidth + bgPadding, 
+                        radius + borderWidth - bgPadding, 
+                        radius
+                    );
+                    tempCtx.arcTo(
+                        totalSize - borderWidth + bgPadding, 
+                        totalSize - borderWidth + bgPadding, 
+                        totalSize - radius - borderWidth + bgPadding, 
+                        totalSize - borderWidth + bgPadding, 
+                        radius
+                    );
+                    tempCtx.arcTo(
+                        borderWidth - bgPadding, 
+                        totalSize - borderWidth + bgPadding, 
+                        borderWidth - bgPadding, 
+                        totalSize - radius - borderWidth + bgPadding, 
+                        radius
+                    );
+                    tempCtx.arcTo(
+                        borderWidth - bgPadding, 
+                        borderWidth - bgPadding, 
+                        radius + borderWidth - bgPadding, 
+                        borderWidth - bgPadding, 
+                        radius
+                    );
+                }
                 tempCtx.closePath();
                 tempCtx.fill();
             }

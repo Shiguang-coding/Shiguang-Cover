@@ -2,6 +2,12 @@
   <main class="container mx-auto max-w-[1600px] p-4 flex flex-col lg:flex-row lg:flex-wrap justify-center items-center gap-6">
     <!-- 控制面板 -->
     <div class="w-full lg:flex-1 flex flex-col p-5 card">
+      <!-- 预设管理 -->
+      <PresetManager 
+        :current-config="presetConfig" 
+        @load-preset="handleLoadPreset" 
+      />
+
       <!-- 网址图标选择器 -->
       <div class="flex flex-col gap-2 mb-3">
         <div class="flex flex-col sm:flex-row gap-2">
@@ -262,6 +268,20 @@
             >
           </div>
           <div class="w-full sm:flex-[4] flex items-center gap-2">
+            <label class="whitespace-nowrap text-sm">图标背景</label>
+            <select 
+              v-model="state.borderType" 
+              @change="updatePreview('borderType', $event)"
+              class="input flex-1"
+            >
+              <option value="none">无背景</option>
+              <option value="rounded">圆角背景</option>
+              <option value="circle">圆形背景</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="w-full sm:flex-[6] flex items-center gap-2">
             <label class="whitespace-nowrap text-sm" for="inputIconColor">图标背景颜色</label>
             <div class="flex-1 flex items-center gap-1.5 border border-gray-300 rounded-lg px-2 py-1 focus-within:border-green-500 transition-colors">
               <input
@@ -516,10 +536,12 @@
 import { state, updatePreview, saveImage, getCanvasBlob, drawSquareImage, drawBackground, drawText, drawWatermark, initialize } from '../assets/script.js';
 import { defaultConfig } from '../config';
 import ImageBedModal from './ImageBedModal.vue';
+import PresetManager from './PresetManager.vue';
 
 export default {
   components: {
-    ImageBedModal
+    ImageBedModal,
+    PresetManager
   },
   data() {
     return {
@@ -531,7 +553,7 @@ export default {
       siteIconStatus: '',
       siteIconStatusType: 'info',
       isLoadingSiteIcon: false,
-      iconSource: 'lobe',           // 当前图标源: lobe / thesvg / devicons / iconify
+      iconSource: 'lobe',           // 当前图标源: lobe / thesvg / devicons / iconify / hqicon
       iconVariant: 'icon-color',        // 当前变体（根据图标源动态切换）
       dragHighlight: null,
       showImageBedModal: false,
@@ -553,7 +575,8 @@ export default {
         { value: 'lobe', label: 'LobeHub Icons' },
         { value: 'thesvg', label: 'theSVG' },
         { value: 'devicons', label: 'Developer Icons' },
-        { value: 'iconify', label: 'Iconify' }
+        { value: 'iconify', label: 'Iconify' },
+        { value: 'hqicon', label: 'HQ ICON' }
       ];
     },
     // 当前图标源的变体选项
@@ -584,6 +607,11 @@ export default {
         ],
         iconify: [
           { value: 'default', label: '默认 (Default)' }
+        ],
+        hqicon: [
+          { value: 'default', label: '默认 512px (Default)' },
+          { value: '256', label: '256px' },
+          { value: '1024', label: '1024px' }
         ]
       };
       return variantMap[this.iconSource] || variantMap.lobe;
@@ -594,7 +622,8 @@ export default {
         lobe: '输入图标名称，例如 openai',
         thesvg: '输入图标名称，例如 github、openai',
         devicons: '输入图标名称，例如 docker、react',
-        iconify: '输入图标名称，例如 logos:chrome'
+        iconify: '输入图标名称，例如 logos:chrome',
+        hqicon: '输入应用名称，例如 WeChat、Telegram'
       };
       return placeholders[this.iconSource] || placeholders.lobe;
     },
@@ -604,7 +633,8 @@ export default {
         lobe: 'https://lobehub.com/icons',
         thesvg: 'https://thesvg.org',
         devicons: 'https://xandemon.github.io/developer-icons/icons/All',
-        iconify: 'https://icon-sets.iconify.design/'
+        iconify: 'https://icon-sets.iconify.design/',
+        hqicon: 'https://icon.shiguang666.eu.org/'
       };
       return links[this.iconSource] || links.lobe;
     },
@@ -638,6 +668,31 @@ export default {
       }
       return 'mono';
     },
+    presetConfig() {
+      return {
+        iconSource: this.iconSource,
+        iconVariant: this.iconVariant,
+        iconName: this.iconName,
+        bgColor: state.bgColor,
+        textColor: state.textColor,
+        watermarkColor: state.watermarkColor,
+        iconColor: state.iconColor,
+        shadowColor: state.shadowColor,
+        bgBlur: state.bgBlur,
+        squareSize: state.squareSize,
+        rotation: state.rotation,
+        shadowStrength: state.shadowStrength,
+        iconBgSize: state.iconBgSize,
+        borderType: state.borderType,
+        textSize: state.textSize,
+        selectedFont: state.selectedFont,
+        lineHeight: state.lineHeight,
+        text3D: state.text3D,
+        text: state.text,
+        watermark: state.watermark,
+        imageFormat: this.imageFormat
+      };
+    },
   },
   mounted() {
     this.loadStyles();
@@ -670,6 +725,45 @@ export default {
       });
     },
     updatePreview,
+    handleLoadPreset(config) {
+      // 更新组件data中的配置
+      this.iconSource = config.iconSource;
+      this.iconVariant = config.iconVariant;
+      this.iconName = config.iconName;
+      this.imageFormat = config.imageFormat;
+
+      // 更新state对象中的配置
+      state.bgColor = config.bgColor;
+      state.textColor = config.textColor;
+      state.watermarkColor = config.watermarkColor;
+      state.iconColor = config.iconColor;
+      state.shadowColor = config.shadowColor;
+      state.bgBlur = config.bgBlur;
+      state.squareSize = config.squareSize;
+      state.rotation = config.rotation;
+      state.shadowStrength = config.shadowStrength;
+      state.iconBgSize = config.iconBgSize;
+      state.borderType = config.borderType;
+      state.textSize = config.textSize;
+      state.selectedFont = config.selectedFont;
+      state.lineHeight = config.lineHeight;
+      state.text3D = config.text3D;
+      state.text = config.text;
+      state.watermark = config.watermark;
+
+      // 重新加载图标
+      if (config.iconName) {
+        this.loadIcon();
+      }
+
+      // 重新绘制
+      drawBackground();
+      drawText();
+      drawWatermark();
+      drawSquareImage();
+
+      this.showToast('预设已加载', '已应用预设配置', 'success');
+    },
     removeBgImage() {
       state.bgImageUrl = null;
       drawBackground();
@@ -703,7 +797,8 @@ export default {
         lobe: 'avatar',
         thesvg: 'default',
         devicons: 'default',
-        iconify: 'default'
+        iconify: 'default',
+        hqicon: 'default'
       };
       this.iconVariant = defaultVariants[this.iconSource] || 'default';
       // 如果已有图标名称，重新加载
@@ -798,7 +893,7 @@ export default {
         text: icon.color === 'color' ? ['-text-color', '-text', '-color', ''] : ['-text', '-text-color', ''],
         combine: icon.color === 'color'
           ? ['-brand-color', '-brand', '-text-color', '-text', '-color', '']
-          : ['-brand', '-text', '-brand-color', '']
+          : ['-brand', '-brand-color', '-text', '-text-color', '']
       }[icon.variant] || [''];
 
       return [...new Set(suffixes.map(suffix => `${icon.slug}${suffix}`))];
@@ -839,6 +934,40 @@ export default {
         `https://cdn.jsdelivr.net/gh/xandemon/developer-icons@main/icons/${fullSlug}.svg`,
         `https://raw.githubusercontent.com/xandemon/developer-icons/main/icons/${fullSlug}.svg`
       ];
+    },
+    // HQ ICON (iTunes) 图标 URL 构建
+    getHqIconUrls(iconName) {
+      const size = this.iconVariant === 'default' ? '512' : this.iconVariant;
+      return [
+        `https://itunes.apple.com/search?term=${encodeURIComponent(iconName)}&country=us&entity=software&limit=1`
+      ];
+    },
+    // HQ ICON: 从 iTunes API 获取图标
+    async fetchHqIcon(appName) {
+      const size = this.iconVariant === 'default' ? '512' : this.iconVariant;
+      const searchUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(appName)}&country=us&entity=software&limit=1`;
+      
+      try {
+        const response = await this.fetchIconBlob(searchUrl);
+        if (!response.ok) return null;
+        
+        const data = await response.json();
+        if (!data.results || data.results.length === 0) return null;
+        
+        const artworkUrl = data.results[0].artworkUrl512;
+        if (!artworkUrl) return null;
+        
+        // 将 512x512bb.jpg 转换为指定尺寸的 webp
+        const iconUrl = artworkUrl
+          .replace('/512x512bb.jpg', `/${size}x${size}bb.webp`)
+          .replace('/512x512bb.png', `/${size}x${size}bb.webp`);
+        
+        // 验证图标是否可用
+        const matchedUrl = await this.applyRemoteIcon([iconUrl], `hqicon-${appName}`);
+        return matchedUrl;
+      } catch (error) {
+        return null;
+      }
     },
     // 获取默认变体（default）的图标 URL，用于变体回退
     getDefaultUrls(iconName) {
@@ -1049,10 +1178,10 @@ export default {
           const result = this.getDominantColorWithVariance(img);
           if (result) {
             if (result.isMonochrome) {
-              // 纯色图标：使用互补色作为背景，图标颜色作为标题和水印颜色
-              state.bgColor = this.adjustColorForContrast(result.color);
-              state.textColor = result.color;
-              state.watermarkColor = result.color;
+              // 纯色图标：背景与主色调一致，标题/水印与主色调相反
+              state.bgColor = result.color;
+              state.textColor = this.adjustColorForContrast(result.color);
+              state.watermarkColor = this.adjustColorForContrast(result.color);
             } else if (!this.isLightColor(result.color)) {
               // 多色图标：浅色时保持背景不变
               state.bgColor = result.color;
@@ -1061,6 +1190,7 @@ export default {
             drawBackground();
             drawText();
             drawWatermark();
+            drawSquareImage();
           }
         } finally {
           URL.revokeObjectURL(objectUrl);
@@ -1074,6 +1204,15 @@ export default {
       const g = parseInt(hex.slice(3, 5), 16);
       const b = parseInt(hex.slice(5, 7), 16);
       return (r + g + b) / 3 > 200;
+    },
+    lightenColor(hex, amount) {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      const newR = Math.min(255, Math.round(r + (255 - r) * amount));
+      const newG = Math.min(255, Math.round(g + (255 - g) * amount));
+      const newB = Math.min(255, Math.round(b + (255 - b) * amount));
+      return '#' + [newR, newG, newB].map(v => v.toString(16).padStart(2, '0')).join('');
     },
     getDominantColorWithVariance(img) {
       // 缩小采样尺寸以提升性能
@@ -1126,18 +1265,26 @@ export default {
       return { color, isMonochrome, dominanceRatio };
     },
     adjustColorForContrast(hexColor) {
-      // 返回互补色以形成对比
+      // 纯色图标只有黑白两种相反色
       const r = parseInt(hexColor.slice(1, 3), 16);
       const g = parseInt(hexColor.slice(3, 5), 16);
       const b = parseInt(hexColor.slice(5, 7), 16);
-      
-      const newR = 255 - r;
-      const newG = 255 - g;
-      const newB = 255 - b;
-      
-      return '#' + [newR, newG, newB].map(v => v.toString(16).padStart(2, '0')).join('');
+      const brightness = (r + g + b) / 3;
+      // 白色（亮色）返回黑色，其他颜色返回白色
+      return brightness > 200 ? '#000000' : '#ffffff';
     },
     async selectIcon(iconName) {
+      // HQ ICON 需要先调用 iTunes API 获取图标
+      if (this.iconSource === 'hqicon') {
+        const matchedUrl = await this.fetchHqIcon(iconName);
+        if (matchedUrl) {
+          this.iconUrl = matchedUrl;
+        } else {
+          this.showToast('未找到图标', `在 App Store 中未找到 "${iconName}"，请检查名称。`, 'error');
+        }
+        return;
+      }
+
       const iconUrls = this.getIconUrls(iconName);
       const matchedUrl = await this.applyRemoteIcon(iconUrls);
 
